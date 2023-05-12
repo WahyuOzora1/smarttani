@@ -1,0 +1,173 @@
+import 'package:flutter/material.dart';
+import 'package:smarttaniapp/models/api/plant_api.dart';
+import 'package:smarttaniapp/models/plant_model.dart';
+import 'package:smarttaniapp/screens/plant/detail_plant_screen.dart';
+import 'package:smarttaniapp/utils/constant/color.dart';
+import 'package:smarttaniapp/utils/widgets/circular_indicator_widget.dart';
+
+class AllPlantScreen extends StatefulWidget {
+  const AllPlantScreen({super.key});
+
+  @override
+  State<AllPlantScreen> createState() => _AllPlantScreenState();
+}
+
+class _AllPlantScreenState extends State<AllPlantScreen> {
+  PlantServices plantService = PlantServices();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: primaryColor,
+        title: const Text("Daftar tanaman"),
+      ),
+      body: SafeArea(
+        child: StreamBuilder<List<Plant>>(
+          stream: plantService.fetchPlant(),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return Center(
+                  child: Text('Something went wrong! ${snapshot.error}'));
+            } else if (snapshot.hasData) {
+              final plants = snapshot.data!;
+              // print("ada plants gal $plants");
+              return ListView.builder(
+                  itemCount: plants.length,
+                  itemBuilder: ((context, index) {
+                    final plant = plants[index];
+                    // print("ada plant gak ${plant.nama}");
+                    // print("ada plant deskripsi gak ${plant.deskripsi}");
+
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (_) =>
+                                      DetailProdukScreen(plant: plant)));
+                        },
+                        child: Container(
+                          decoration: const BoxDecoration(color: formColor),
+                          height: 150,
+                          width: double.infinity,
+                          child: Row(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Card(
+                                  elevation: 10,
+                                  shadowColor: secondaryColor,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(3.0),
+                                    child: Image.network(
+                                      plant.imageUrl ??
+                                          "https://firebasestorage.googleapis.com/v0/b/wahyufirebase.appspot.com/o/images%2F1683627520154?alt=media&token=fdb375f1-ad77-450f-82e6-dcaf52c98c72",
+                                      height: 100,
+                                      width: 100,
+                                      fit: BoxFit.cover,
+                                      loadingBuilder: (BuildContext context,
+                                          Widget child,
+                                          ImageChunkEvent? loadingProgress) {
+                                        if (loadingProgress == null) {
+                                          return child;
+                                        }
+                                        return Center(
+                                            child: circularProgressIndicator());
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 4),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "${plant.nama} (${plant.namaLatin})",
+                                        style: const TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w600),
+                                        textAlign: TextAlign.justify,
+                                        maxLines: 3,
+                                      ),
+                                      const SizedBox(height: 10),
+                                      Row(
+                                        children: [
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              const Text("KINGDOM",
+                                                  style: TextStyle(
+                                                      color: Color.fromARGB(
+                                                          221, 58, 57, 57))),
+                                              const SizedBox(
+                                                height: 5,
+                                              ),
+                                              Text(plant.kingdom,
+                                                  style: const TextStyle(
+                                                      color: secondaryColor))
+                                            ],
+                                          ),
+                                          const SizedBox(
+                                            width: 20,
+                                          ),
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              const Text("Family",
+                                                  style: TextStyle(
+                                                      color: Color.fromARGB(
+                                                          221, 58, 57, 57))),
+                                              const SizedBox(
+                                                height: 5,
+                                              ),
+                                              Text(plant.family,
+                                                  style: const TextStyle(
+                                                      color: secondaryColor))
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 10),
+                                      const Text(
+                                        "DESKRIPSI",
+                                        style: TextStyle(
+                                            color: Color.fromARGB(
+                                                221, 58, 57, 57)),
+                                      ),
+                                      const SizedBox(height: 5),
+                                      Text(
+                                        plant.deskripsi,
+                                        maxLines: 2,
+                                        textAlign: TextAlign.justify,
+                                        style: const TextStyle(
+                                            color: secondaryColor),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  }));
+            } else {
+              return Center(child: circularProgressIndicator());
+            }
+          },
+        ),
+      ),
+    );
+  }
+}
