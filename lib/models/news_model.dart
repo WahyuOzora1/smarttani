@@ -40,22 +40,22 @@ class NewsModel {
 class Result {
   String title;
   String link;
-  List<Keyword> keywords;
-  List<String>? creator;
+  List<String>? keywords;
+  dynamic creator;
   dynamic videoUrl;
   String description;
   String? content;
   DateTime pubDate;
   String? imageUrl;
-  SourceId sourceId;
-  List<Category> category;
+  String sourceId;
+  List<String> category;
   List<Country> country;
   Language language;
 
   Result({
     required this.title,
     required this.link,
-    required this.keywords,
+    this.keywords,
     this.creator,
     this.videoUrl,
     required this.description,
@@ -71,19 +71,17 @@ class Result {
   factory Result.fromJson(Map<String, dynamic> json) => Result(
         title: json["title"],
         link: json["link"],
-        keywords: List<Keyword>.from(
-            json["keywords"].map((x) => keywordValues.map[x]!)),
-        creator: json["creator"] == null
+        keywords: json["keywords"] == null
             ? []
-            : List<String>.from(json["creator"]!.map((x) => x)),
+            : List<String>.from(json["keywords"]!.map((x) => x)),
+        creator: json["creator"],
         videoUrl: json["video_url"],
         description: json["description"],
         content: json["content"],
         pubDate: DateTime.parse(json["pubDate"]),
         imageUrl: json["image_url"],
-        sourceId: sourceIdValues.map[json["source_id"]]!,
-        category: List<Category>.from(
-            json["category"].map((x) => categoryValues.map[x]!)),
+        sourceId: json["source_id"],
+        category: List<String>.from(json["category"].map((x) => x)),
         country: List<Country>.from(
             json["country"].map((x) => countryValues.map[x]!)),
         language: languageValues.map[json["language"]]!,
@@ -93,53 +91,30 @@ class Result {
         "title": title,
         "link": link,
         "keywords":
-            List<dynamic>.from(keywords.map((x) => keywordValues.reverse[x])),
-        "creator":
-            creator == null ? [] : List<dynamic>.from(creator!.map((x) => x)),
+            keywords == null ? [] : List<dynamic>.from(keywords!.map((x) => x)),
+        "creator": creator,
         "video_url": videoUrl,
         "description": description,
         "content": content,
         "pubDate": pubDate.toIso8601String(),
         "image_url": imageUrl,
-        "source_id": sourceIdValues.reverse[sourceId],
-        "category":
-            List<dynamic>.from(category.map((x) => categoryValues.reverse[x])),
+        "source_id": sourceId,
+        "category": List<dynamic>.from(category.map((x) => x)),
         "country":
             List<dynamic>.from(country.map((x) => countryValues.reverse[x])),
         "language": languageValues.reverse[language],
       };
 }
 
-// ignore: constant_identifier_names
-enum Category { TOP, ENTERTAINMENT }
+enum Country { INDONESIA, HUNGARY }
 
-final categoryValues =
-    EnumValues({"entertainment": Category.ENTERTAINMENT, "top": Category.TOP});
+final countryValues =
+    EnumValues({"hungary": Country.HUNGARY, "indonesia": Country.INDONESIA});
 
-// ignore: constant_identifier_names
-enum Country { INDONESIA }
+enum Language { INDONESIAN, HUNGARIAN }
 
-final countryValues = EnumValues({"indonesia": Country.INDONESIA});
-
-// ignore: constant_identifier_names
-enum Keyword { HOT, LIFESTYLE, ASIA_PASIFIK }
-
-final keywordValues = EnumValues({
-  "Asia Pasifik": Keyword.ASIA_PASIFIK,
-  "Hot": Keyword.HOT,
-  "Lifestyle": Keyword.LIFESTYLE
-});
-
-// ignore: constant_identifier_names
-enum Language { INDONESIAN }
-
-final languageValues = EnumValues({"indonesian": Language.INDONESIAN});
-
-// ignore: constant_identifier_names
-enum SourceId { LIPUTAN6, REPUBLIKAIN }
-
-final sourceIdValues = EnumValues(
-    {"liputan6": SourceId.LIPUTAN6, "republikain": SourceId.REPUBLIKAIN});
+final languageValues = EnumValues(
+    {"hungarian": Language.HUNGARIAN, "indonesian": Language.INDONESIAN});
 
 class EnumValues<T> {
   Map<String, T> map;

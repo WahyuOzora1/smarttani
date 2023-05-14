@@ -10,7 +10,7 @@ class PlantServices {
 
   Future<void> createPlant(Plant plant) async {
     final docplant = FirebaseFirestore.instance.collection('plant').doc();
-    // plant.id = docplant.id;
+    plant.id = docplant.id;
 
     final json = plant.toJson();
     await docplant.set(json);
